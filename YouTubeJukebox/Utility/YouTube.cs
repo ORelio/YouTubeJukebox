@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Net;
 using System.IO;
 using System.Threading;
+using System.Net.Sockets;
 
 namespace SharpTools
 {
@@ -152,6 +153,7 @@ namespace SharpTools
                 }
             }
             catch (IOException) { }
+            catch (SocketException) { }
 
             return null;
         }
@@ -274,15 +276,19 @@ namespace SharpTools
                 }
                 else updateListener.UpdateYTDLStatus(channelName, new List<string>(), YTEventLevel.Error, YTDLStatus.RequestFailed);
             }
-            catch (IOException)
-            {
-                if (updateListener != null)
-                    updateListener.UpdateYTDLStatus(channelName, new List<string>(), YTEventLevel.Error, YTDLStatus.RequestFailed);
-            }
             catch (NullReferenceException)
             {
                 if (updateListener != null)
                     updateListener.UpdateYTDLStatus(channelName, new List<string>(), YTEventLevel.Error, YTDLStatus.InvalidData);
+            }
+            catch (Exception e)
+            {
+                if (e is IOException || e is SocketException)
+                {
+                    if (updateListener != null)
+                        updateListener.UpdateYTDLStatus(channelName, new List<string>(), YTEventLevel.Error, YTDLStatus.RequestFailed);
+                }
+                else throw;
             }
 
             return new List<string>();
