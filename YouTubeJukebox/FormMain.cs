@@ -51,6 +51,7 @@ namespace YouTubeJukebox
             LoadingProgress.Text = Translations.Get("text_loading");
             YouTubeChannelReadRandom.Text = Translations.Get("setting_shuffle");
             YouTubeChannelReadReverse.Text = Translations.Get("setting_reverse");
+            YouTubeChannelReadOnlyNew.Text = Translations.Get("setting_onlynew");
             YoutubeTabPage.Text = Translations.Get("tab_youtube");
             PlayerTabPage.Text = Translations.Get("tab_player");
             AboutTabPage.Text = Translations.Get("tab_about");
@@ -294,18 +295,23 @@ namespace YouTubeJukebox
                 string channelName = Settings.ChannelDatabaseGetFixedName(YoutubeChannelNameHistory.Text.Trim());
                 Settings.PlayReverse = YouTubeChannelReadReverse.Checked;
                 Settings.PlayRandom = YouTubeChannelReadRandom.Checked;
+                Settings.PlayOnlyNew = YouTubeChannelReadOnlyNew.Checked;
                 Settings.Save();
 
                 List<string> videoCache = null;
                 var database = Settings.ChannelDatabaseGet();
                 if (database.ContainsKey(channelName))
                     videoCache = database[channelName];
+                List<string> videoCacheOrig
+                    = videoCache != null
+                    ? new List<string>(videoCache)
+                    : new List<string>();
                 
                 lock (_threadRetrieveVideosLock)
                 {
                     _threadRetrieveVideos = new Thread(() =>
                     {
-                        YouTube.GetChannelVideos(channelName, videoCache, this);
+                        YouTube.GetChannelVideos(channelName, videoCache, this, videoCacheOrig);
                     });
                     _threadRetrieveVideos.Start();
                 }
@@ -319,11 +325,12 @@ namespace YouTubeJukebox
         /// <param name="videos">Videos that have been retrieved so far</param>
         /// <param name="level">Event level (normal, warning, error)</param>
         /// <param name="status">Event status (downloading, finished with error, finished without error)</param>
-        public void UpdateYTDLStatus(string channelName, List<string> videos, YTEventLevel level, YTDLStatus status)
+        /// <param name="metatadata">Event metadata provided when stating download using YouTube.GetChannelVideos()</param>
+        public void UpdateYTDLStatus(string channelName, List<string> videos, YTEventLevel level, YTDLStatus status, object metadata)
         {
             if (InvokeRequired)
             {
-                Invoke(new Action(() => UpdateYTDLStatus(channelName, videos, level, status)));
+                Invoke(new Action(() => UpdateYTDLStatus(channelName, videos, level, status, metadata)));
                 return;
             }
 
@@ -381,7 +388,7 @@ namespace YouTubeJukebox
             if (status != YTDLStatus.Downloading && level != YTEventLevel.Error)
             {
                 string tempPlayList = "playlist-" + channelName.ToLowerInvariant() + ".m3u";
-                File.WriteAllLines(tempPlayList, Settings.ApplyPlayModifiers(videos).Select(video => YouTube.GetVideoUrl(video)));
+                File.WriteAllLines(tempPlayList, Settings.ApplyPlayModifiers(videos, metadata as List<string>).Select(video => YouTube.GetVideoUrl(video)));
                 if (Tools.IsValidExeFile(Settings.MediaPlayerExe))
                 {
                     Process.Start(Settings.MediaPlayerExe, tempPlayList);

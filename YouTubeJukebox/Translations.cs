@@ -55,6 +55,7 @@ namespace YouTubeJukebox
                 translations["help_output"] = "Sortie : Fichier de sortie, sinon la sortie standard sera utilisée";
                 translations["help_reverse"] = "--reverse ou -r : Lit en commençant par la vidéo la plus ancienne";
                 translations["help_shuffle"] = "--shuffle ou -s : Lit les vidéos dans un ordre aléatoire";
+                translations["help_onlynew"] = "--onlynew ou -o : Lit seulement les nouvelles vidéos (inutile si -n)";
                 translations["help_nocache"] = "--nocache ou -n : Ne crée/utilise pas le fichier de cache des vidéos";
                 translations["help_verbose"] = "--verbose ou -v : Affiche l'avancement de la récupération des vidéos";
                 translations["help_help"] = "--help    ou -? : Affiche ce message d'aide";
@@ -77,6 +78,7 @@ namespace YouTubeJukebox
 
                 translations["setting_shuffle"] = "Mélanger les vidéos";
                 translations["setting_reverse"] = "Lire en ordre inverse";
+                translations["setting_onlynew"] = "Seulement les nouvelles vidéos";
 
                 translations["button_play"] = "Lecture";
                 translations["button_exit"] = "Quitter";
@@ -99,6 +101,7 @@ namespace YouTubeJukebox
                 translations["help_output"] = "Output : Output file, otherwise standard output will be used";
                 translations["help_reverse"] = "--reverse or -r : Play oldest video first instead of newest first";
                 translations["help_shuffle"] = "--shuffle or -s : Play videos in a random order (overrides -r)";
+                translations["help_onlynew"] = "--onlynew or -o : Play only new videos (has no effect if using -n)";
                 translations["help_nocache"] = "--nocache or -n : Prevent video cache file from being used or created";
                 translations["help_verbose"] = "--verbose or -v : Show status messages while retrieving videos";
                 translations["help_help"] = "--help    or -? : Shows this help message";
@@ -130,6 +133,7 @@ namespace YouTubeJukebox
 
                 translations["setting_shuffle"] = "Shuffle videos";
                 translations["setting_reverse"] = "Reverse order";
+                translations["setting_onlynew"] = "Only new videos";
 
                 translations["button_play"] = "Play";
                 translations["button_exit"] = "Exit";

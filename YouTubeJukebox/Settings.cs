@@ -29,6 +29,11 @@ namespace YouTubeJukebox
         public static bool PlayRandom { get; set; }
 
         /// <summary>
+        /// Specify that only new videos that were posted since last video retrieval should be played
+        /// </summary>
+        public static bool PlayOnlyNew { get; set; }
+
+        /// <summary>
         /// Specify which media player to use for reading the generated playlist
         /// </summary>
         public static string MediaPlayerExe { get; set; }
@@ -51,9 +56,13 @@ namespace YouTubeJukebox
         /// Apply video presets to the specified list of videos
         /// </summary>
         /// <param name="videos">list of videos</param>
+        /// <param name="videoCache">list of videos that were previously cached</param>
         /// <returns>modified list of videos</returns>
-        public static List<string> ApplyPlayModifiers(List<string> videos)
+        public static List<string> ApplyPlayModifiers(List<string> videos, List<string> videoCache)
         {
+            if (PlayOnlyNew && videoCache != null)
+                videos = videos.Where(video => !videoCache.Contains(video)).ToList();
+
             if (PlayReverse)
                 videos.Reverse();
 

@@ -35,6 +35,7 @@ namespace YouTubeJukebox
 
             bool playRandom = false;
             bool playReverse = false;
+            bool playOnlyNew = false;
                 
             List<string> remainingArgs = new List<string>();
                 
@@ -57,6 +58,10 @@ namespace YouTubeJukebox
 
                             case "shuffle":
                                 playRandom = true;
+                                break;
+
+                            case "onlynew":
+                                playOnlyNew = true;
                                 break;
 
                             case "nocache":
@@ -94,6 +99,10 @@ namespace YouTubeJukebox
                                     playRandom = true;
                                     break;
 
+                                case 'o':
+                                    playOnlyNew = true;
+                                    break;
+
                                 case 'n':
                                     Settings.SavingEnabled = false;
                                     break;
@@ -125,6 +134,7 @@ namespace YouTubeJukebox
 
             Settings.PlayRandom = playRandom;
             Settings.PlayReverse = playReverse;
+            Settings.PlayOnlyNew = playOnlyNew;
 
             if (verbose || help || remainingArgs.Count == 0)
                 Console.Error.WriteLine(Program.Name + " v" + Program.Version);
@@ -139,6 +149,7 @@ namespace YouTubeJukebox
                 Console.Error.WriteLine(Translations.Get("help_output"));
                 Console.Error.WriteLine(Translations.Get("help_reverse"));
                 Console.Error.WriteLine(Translations.Get("help_shuffle"));
+                Console.Error.WriteLine(Translations.Get("help_onlynew"));
                 Console.Error.WriteLine(Translations.Get("help_nocache"));
                 Console.Error.WriteLine(Translations.Get("help_verbose"));
                 Console.Error.WriteLine(Translations.Get("help_help"));
@@ -170,11 +181,15 @@ namespace YouTubeJukebox
             var database = Settings.ChannelDatabaseGet();
             if (database.ContainsKey(channelName))
                 videoCache = database[channelName];
+            List<string> videoCacheOrig
+                    = videoCache != null
+                    ? new List<string>(videoCache)
+                    : new List<string>();
 
             string playList
                 = String.Join(Tools.IsUsingMono ? "\n" : "\r\n",
                     Settings.ApplyPlayModifiers
-                        (YouTube.GetChannelVideos(channelName, videoCache, this))
+                        (YouTube.GetChannelVideos(channelName, videoCache, this), videoCacheOrig)
                             .Select(video => YouTube.GetVideoUrl(video)));
 
             if (outputPlaylist != null)
@@ -185,13 +200,14 @@ namespace YouTubeJukebox
         }
 
         /// <summary>
-        /// Update
+        /// Video Retrieval Status Update Event
         /// </summary>
-        /// <param name="channelName"></param>
-        /// <param name="videos"></param>
-        /// <param name="level"></param>
-        /// <param name="status"></param>
-        public void UpdateYTDLStatus(string channelName, List<string> videos, YTEventLevel level, YTDLStatus status)
+        /// <param name="channelName">Name of the YouTube channel</param>
+        /// <param name="videos">Videos that have been retrieved so far</param>
+        /// <param name="level">Event level (normal, warning, error)</param>
+        /// <param name="status">Event status (downloading, finished with error, finished without error)</param>
+        /// <param name="metatadata">Event metadata provided when stating download using YouTube.GetChannelVideos()</param>
+        public void UpdateYTDLStatus(string channelName, List<string> videos, YTEventLevel level, YTDLStatus status, object metadata)
         {
             string logLevel = "";
 

@@ -51,6 +51,7 @@
             this.aboutDescription = new System.Windows.Forms.Label();
             this.aboutSubtitle = new System.Windows.Forms.Label();
             this.aboutTitle = new System.Windows.Forms.Label();
+            this.YouTubeChannelReadOnlyNew = new System.Windows.Forms.CheckBox();
             this.MediaPlayerGroupBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.MediaPlayerIcon)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.LoadingAnim)).BeginInit();
@@ -154,6 +155,7 @@
             // 
             // YoutubeTabPage
             // 
+            this.YoutubeTabPage.Controls.Add(this.YouTubeChannelReadOnlyNew);
             this.YoutubeTabPage.Controls.Add(this.YouTubeChannelReadRandom);
             this.YoutubeTabPage.Controls.Add(this.YouTubeChannelReadReverse);
             this.YoutubeTabPage.Controls.Add(this.YoutubeChannelImage);
@@ -295,6 +297,16 @@
             this.aboutTitle.TabIndex = 0;
             this.aboutTitle.Text = "YouTube Jukebox";
             // 
+            // YouTubeChannelReadOnlyNew
+            // 
+            this.YouTubeChannelReadOnlyNew.AutoSize = true;
+            this.YouTubeChannelReadOnlyNew.Location = new System.Drawing.Point(128, 90);
+            this.YouTubeChannelReadOnlyNew.Name = "YouTubeChannelReadOnlyNew";
+            this.YouTubeChannelReadOnlyNew.Size = new System.Drawing.Size(104, 17);
+            this.YouTubeChannelReadOnlyNew.TabIndex = 11;
+            this.YouTubeChannelReadOnlyNew.Text = "Only new videos";
+            this.YouTubeChannelReadOnlyNew.UseVisualStyleBackColor = true;
+            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -352,6 +364,7 @@
         private System.Windows.Forms.Label aboutTitle;
         private System.Windows.Forms.LinkLabel aboutWebsite;
         private System.Windows.Forms.Label aboutDescription;
+        private System.Windows.Forms.CheckBox YouTubeChannelReadOnlyNew;
     }
 }
 

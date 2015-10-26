@@ -164,8 +164,9 @@ namespace SharpTools
         /// <param name="channelName">Channel Name</param>
         /// <param name="videoCache">Video Cache for speeding up retrieval - only new videos will be added at the beginning of the list</param>
         /// <param name="updateListener">Listener to send download updates to - amount of successfully processed videos will be sent there</param>
+        /// <param name="metadata">Metadata to pass to the update listener. Will be passed as is without any modification</param>
         /// <returns>A list of video identifiers, newest first, from the specified channel or null if failed to retrieve</returns>
-        public static List<String> GetChannelVideos(string channelName, List<string> videoCache = null, IYTStatusListener updateListener = null)
+        public static List<String> GetChannelVideos(string channelName, List<string> videoCache = null, IYTStatusListener updateListener = null, object metadata = null)
         {
             string videosPageResource = YTChannelUrlBase + channelName + YTChannelVideosPage;
             Dictionary<string, string> cookies = new Dictionary<string, string>();
@@ -203,7 +204,7 @@ namespace SharpTools
                                 {
                                     videos.AddRange(videoCache);
                                     if (updateListener != null)
-                                        updateListener.UpdateYTDLStatus(channelName, videos, YTEventLevel.Info, YTDLStatus.FinishedOK);
+                                        updateListener.UpdateYTDLStatus(channelName, videos, YTEventLevel.Info, YTDLStatus.FinishedOK, metadata);
                                     return videos;
                                 }
 
@@ -220,7 +221,7 @@ namespace SharpTools
 
                         //Update progress callback
                         if (updateListener != null)
-                            updateListener.UpdateYTDLStatus(channelName, videos, YTEventLevel.Info, YTDLStatus.Downloading);
+                            updateListener.UpdateYTDLStatus(channelName, videos, YTEventLevel.Info, YTDLStatus.Downloading, metadata);
 
                         //Retrieve Url for next query
                         nextQueryUrl = FindStringWithDelimiters(nextQueryToParse, DelimeterAjaxMoreVideos, '"');
@@ -257,36 +258,36 @@ namespace SharpTools
                             else
                             {
                                 if (updateListener != null)
-                                    updateListener.UpdateYTDLStatus(channelName, videos, YTEventLevel.Warning, YTDLStatus.InvalidData);
+                                    updateListener.UpdateYTDLStatus(channelName, videos, YTEventLevel.Warning, YTDLStatus.InvalidData, metadata);
                                 break;
                             }
                         }
                         else
                         {
                             if (updateListener != null)
-                                updateListener.UpdateYTDLStatus(channelName, videos, YTEventLevel.Warning, YTDLStatus.RequestFailed);
+                                updateListener.UpdateYTDLStatus(channelName, videos, YTEventLevel.Warning, YTDLStatus.RequestFailed, metadata);
                             break;
                         }
                     }
                     
                     if (updateListener != null)
-                        updateListener.UpdateYTDLStatus(channelName, videos, YTEventLevel.Info, YTDLStatus.FinishedOK);
+                        updateListener.UpdateYTDLStatus(channelName, videos, YTEventLevel.Info, YTDLStatus.FinishedOK, metadata);
 
                     return videos;
                 }
-                else updateListener.UpdateYTDLStatus(channelName, new List<string>(), YTEventLevel.Error, YTDLStatus.RequestFailed);
+                else updateListener.UpdateYTDLStatus(channelName, new List<string>(), YTEventLevel.Error, YTDLStatus.RequestFailed, metadata);
             }
             catch (NullReferenceException)
             {
                 if (updateListener != null)
-                    updateListener.UpdateYTDLStatus(channelName, new List<string>(), YTEventLevel.Error, YTDLStatus.InvalidData);
+                    updateListener.UpdateYTDLStatus(channelName, new List<string>(), YTEventLevel.Error, YTDLStatus.InvalidData, metadata);
             }
             catch (Exception e)
             {
                 if (e is IOException || e is SocketException)
                 {
                     if (updateListener != null)
-                        updateListener.UpdateYTDLStatus(channelName, new List<string>(), YTEventLevel.Error, YTDLStatus.RequestFailed);
+                        updateListener.UpdateYTDLStatus(channelName, new List<string>(), YTEventLevel.Error, YTDLStatus.RequestFailed, metadata);
                 }
                 else throw;
             }
@@ -317,6 +318,7 @@ namespace SharpTools
         /// <param name="videos">Videos that have been retrieved so far</param>
         /// <param name="level">Event level (normal, warning, error)</param>
         /// <param name="status">Event status (downloading, finished with error, finished without error)</param>
-        void UpdateYTDLStatus(string channelName, List<string> videos, YTEventLevel level, YTDLStatus status);
+        /// <param name="metatadata">Event metadata provided when stating download using YouTube.GetChannelVideos()</param>
+        void UpdateYTDLStatus(string channelName, List<string> videos, YTEventLevel level, YTDLStatus status, object metatadata);
     }
 }

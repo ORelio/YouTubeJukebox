@@ -14,7 +14,7 @@ namespace YouTubeJukebox
     public static class Program
     {
         public const string Name = "YouTube Jukebox";
-        public const string Version = "1.0";
+        public const string Version = "1.0.1";
 
         /// <summary>
         /// The main entry point for the application.
